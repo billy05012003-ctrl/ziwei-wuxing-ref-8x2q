@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>紫微五行投資系統</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #f8f6f0; color: #1a1a1a; min-height: 100vh; }
+
+.header { background: #1a1a1a; color: #f0e6c8; padding: 2rem; text-align: center; }
+.header h1 { font-size: 1.6rem; font-weight: 500; letter-spacing: 0.05em; }
+.header p { font-size: 0.85rem; color: #a0906a; margin-top: 0.5rem; }
+
+.container { max-width: 1180px; margin: 0 auto; padding: 2rem 1rem; }
+
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start; }
+.left-panel { position: sticky; top: 1.5rem; display: flex; flex-direction: column; }
+.right-panel { min-width: 0; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .left-panel { position: static; }
+}
+
+.left-panel .grid-2, .left-panel .grid-3 { grid-template-columns: 1fr; }
+
+.section { background: #fff; border-radius: 12px; border: 0.5px solid #e0d8c8; padding: 1.5rem; margin-bottom: 1.5rem; }
+.section-title { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; color: #8a7a5a; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 0.5px solid #e8e0d0; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+label { display: block; font-size: 0.8rem; color: #6a5a3a; margin-bottom: 0.4rem; }
+input, select { width: 100%; padding: 0.55rem 0.75rem; border: 0.5px solid #d0c8b0; border-radius: 8px; font-size: 0.9rem; background: #faf8f4; color: #1a1a1a; outline: none; }
+input:focus, select:focus { border-color: #8a6a2a; }
+
+.btn { width: 100%; padding: 0.85rem; background: #1a1a1a; color: #f0e6c8; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; letter-spacing: 0.05em; margin-top: 0.5rem; }
+.btn:hover { background: #2a2a2a; }
+
+.results { display: none; }
+.results.show { display: block; }
+
+.result-section { background: #fff; border-radius: 12px; border: 0.5px solid #e0d8c8; padding: 1.5rem; margin-bottom: 1.5rem; overflow-x: auto; }
+.result-title { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; color: #8a7a5a; text-transform: uppercase; margin-bottom: 1rem; }
+
+table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 0.85rem; }
+@media (max-width: 640px) {
+  table { min-width: 720px; }
+}
+th { text-align: left; padding: 0.6rem 0.75rem; background: #f4f0e8; color: #6a5a3a; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; }
+td { padding: 0.6rem 0.75rem; border-bottom: 0.5px solid #ece8e0; color: #2a2a2a; }
+tr:last-child td { border-bottom: none; }
+
+.three-layer { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+.alloc-bar-row { display: grid; grid-template-columns: 60px 1fr 48px; align-items: center; gap: 0.6rem; margin-bottom: 0.1rem; font-size: 0.78rem; }
+.alloc-bar-note { font-size: 0.68rem; color: #8a7a5a; margin: 0 0 0.6rem 66px; }
+.alloc-bar-track { height: 10px; border-radius: 6px; background: #ece8e0; overflow: hidden; }
+.alloc-bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+.layer-card { border-radius: 10px; padding: 1.2rem; text-align: center; }
+.layer-card.short { background: #e8f0e8; border: 0.5px solid #a8c8a8; }
+.layer-card.long { background: #f4eee0; border: 0.5px solid #c8b888; }
+.layer-label { font-size: 0.7rem; letter-spacing: 0.1em; color: #5a5a5a; text-transform: uppercase; margin-bottom: 0.5rem; }
+.layer-element { font-size: 1.5rem; font-weight: 500; margin-bottom: 0.3rem; }
+.layer-note { font-size: 0.75rem; color: #5a5a5a; }
+
+.element-tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0.1rem; }
+.tag-tu { background: #f0ead0; color: #6a4a0a; }
+.tag-jin { background: #f0f0e0; color: #4a4a1a; }
+.tag-shui { background: #e0eef8; color: #0a3a6a; }
+.tag-mu { background: #e4f0e0; color: #1a5a1a; }
+.tag-huo { background: #fce8e0; color: #7a2a0a; }
+
+.stock-ref-row { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 1rem; padding: 0.75rem 0; border-bottom: 0.5px solid #ece8e0; align-items: start; }
+.stock-ref-row:last-child { border-bottom: none; }
+.stock-ref-market-label { font-size: 0.7rem; color: #8a7a5a; margin-bottom: 0.4rem; }
+.stock-sector-label { font-size: 0.68rem; font-weight: 600; color: #6a5a3a; margin: 0.4rem 0 0.2rem; }
+.stock-sector-label:first-child { margin-top: 0; }
+.stock-badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 20px; font-size: 0.72rem; margin: 0.15rem; border: 0.5px solid #d0c8b0; background: #faf8f4; color: #4a4a4a; cursor: default; }
+
+.investment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
+.inv-card { border-radius: 10px; padding: 1rem; border: 1.5px solid #e0d8c8; background: #faf8f4; transition: all 0.3s ease; }
+.inv-element { font-size: 0.7rem; color: #8a7a5a; margin-bottom: 0.4rem; }
+
+.inv-card.flow-hot { border-color: #c8922a; background: #fdf6e8; box-shadow: 0 0 0 1px #c8922a, 0 0 12px rgba(200,146,42,0.45); animation: flowGlow 1.8s ease-in-out infinite; }
+.inv-card.flow-stable { border-color: #185fa5; background: #eef4fa; box-shadow: 0 0 0 1px #185fa5; }
+.inv-card.flow-risk { border-color: #a32d2d; background: #fbecec; box-shadow: 0 0 0 1px #a32d2d; }
+.inv-card.flow-neutral { border-color: #e0d8c8; background: #faf8f4; }
+@keyframes flowGlow {
+  0%, 100% { box-shadow: 0 0 0 1px #c8922a, 0 0 8px rgba(200,146,42,0.35); }
+  50% { box-shadow: 0 0 0 1px #c8922a, 0 0 18px rgba(200,146,42,0.65); }
+}
+
+.flow-year-picker { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
+.flow-year-picker button { width: 32px; height: 32px; border-radius: 8px; border: 0.5px solid #d0c8b0; background: #fff; cursor: pointer; font-size: 0.9rem; }
+.flow-year-picker button:hover { background: #f4f0e8; }
+.flow-year-picker span { font-size: 0.85rem; color: #6a5a3a; min-width: 70px; text-align: center; }
+
+@media (max-width: 600px) {
+  .grid-2, .grid-3, .three-layer { grid-template-columns: 1fr; }
+}
+
+.export-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.export-btn { flex: 1; min-width: 120px; padding: 0.7rem; background: #fff; color: #1a1a1a; border: 0.5px solid #d0c8b0; border-radius: 8px; font-size: 0.85rem; cursor: pointer; }
+.export-btn:hover { background: #f4f0e8; }
+
+@media print {
+  .header, .section, .export-bar { display: none !important; }
+  body { background: #fff; }
+  .result-section { border: 0.5px solid #ccc; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div id="gateOverlay" style="position:fixed;inset:0;background:#f8f6f0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="max-width:320px;width:100%;background:#fff;border-radius:12px;border:0.5px solid #e0d8c8;padding:2rem;text-align:center;">
+    <div id="gateExpired" style="display:none;font-size:0.95rem;color:#a32d2d;line-height:1.6">此工具使用期限已到期，暫停提供。</div>
+    <div id="gateLogin">
+      <div style="font-size:0.9rem;color:#6a5a3a;margin-bottom:1rem">請輸入密碼</div>
+      <input type="password" id="gatePassword" style="width:100%;padding:0.6rem;border:0.5px solid #d0c8b0;border-radius:8px;font-size:1rem;margin-bottom:0.75rem;background:#faf8f4;color:#1a1a1a" placeholder="密碼" onkeydown="if(event.key==='Enter') checkGatePassword()">
+      <button onclick="checkGatePassword()" style="width:100%;padding:0.7rem;background:#1a1a1a;color:#f0e6c8;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem">確認</button>
+      <div id="gateError" style="display:none;color:#a32d2d;font-size:0.8rem;margin-top:0.6rem">密碼錯誤，請再試一次</div>
+    </div>
+  </div>
+</div>
+<div id="appContent" style="display:none">
+
+<div class="header">
+  <h1>紫微五行投資系統</h1>
+  <p>北派紫微斗數 × 八字五行 × 流年操作</p>
+</div>
+
+<div class="container">
+<div class="layout">
+<div class="left-panel">
+
+  <div class="section">
+    <div class="section-title">第一區：基本生辰</div>
+    <div class="grid-3">
+      <div>
+        <label>出生年份（國曆）</label>
+        <input type="number" id="year" placeholder="例：1986" min="1900" max="2100" value="1986">
+      </div>
+      <div>
+        <label>出生月份</label>
+        <select id="month">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5" selected>5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+        </select>
+      </div>
+      <div>
+        <label>出生日期</label>
+        <input type="number" id="day" placeholder="例：1" min="1" max="31" value="1">
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:1rem">
+      <div>
+        <label>出生時辰</label>
+        <select id="hour">
+          <option value="子">子時（23:00–01:00）</option>
+          <option value="丑">丑時（01:00–03:00）</option>
+          <option value="寅">寅時（03:00–05:00）</option>
+          <option value="卯" selected>卯時（05:00–07:00）</option>
+          <option value="辰">辰時（07:00–09:00）</option>
+          <option value="巳">巳時（09:00–11:00）</option>
+          <option value="午">午時（11:00–13:00）</option>
+          <option value="未">未時（13:00–15:00）</option>
+          <option value="申">申時（15:00–17:00）</option>
+          <option value="酉">酉時（17:00–19:00）</option>
+          <option value="戌">戌時（19:00–21:00）</option>
+          <option value="亥">亥時（21:00–23:00）</option>
+        </select>
+      </div>
+      <div>
+        <label>性別</label>
+        <select id="gender">
+          <option value="male" selected>男</option>
+          <option value="female">女</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第二區：紫微定盤（自動計算）</div>
+    <p style="font-size:0.8rem;color:#8a7a5a;line-height:1.6">系統會依第一區的生辰自動排出命宮／身宮／五行局／十二宮與大限起訖。</p>
+    <button class="btn" onclick="generate()">產出五行投資分析 →</button>
+  </div>
+
+  <div class="export-bar">
+      <button class="export-btn" onclick="exportPDF()">匯出 PDF</button>
+      <button class="export-btn" onclick="exportPNG()">匯出圖片</button>
+      <button class="export-btn" onclick="exportCSV()">匯出 CSV</button>
+      <button class="export-btn" onclick="copyAIPrompt()">複製AI提示詞</button>
+  </div>
+
+</div>
+<div class="right-panel">
+  <div class="results" id="results">
+
+    <div class="result-section">
+      <div class="result-title">表格零：紫微定盤（自動）</div>
+      <div style="font-size:0.75rem;color:#8a7a5a;margin-bottom:0.75rem">🎯 標記代表該次四化剛好落在命/財/官/田/兄五個財務核心宮，值得多留意；此為單層標記，不代表宮位之間有進一步的飛化追蹤關係。</div>
+      <div id="ziweiInfo" style="margin-bottom:1rem;font-size:0.85rem;color:#6a5a3a"></div>
+      <table id="t0"></table>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">表格一：純五行分析（長期）</div>
+      <div id="baziInfo" style="margin-bottom:1rem;font-size:0.85rem;color:#6a5a3a"></div>
+      <table id="t1"></table>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">表格二：紫微大限</div>
+      <table id="t3"></table>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">表格三：紫微流年操作方向</div>
+      <table id="t4"></table>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">表格四：紫微大限×下一大限×五行</div>
+      <div class="flow-year-picker">
+        <button onclick="stepFlowYear(-1)">◀</button>
+        <span id="flowYearLabel">流年</span>
+        <button onclick="stepFlowYear(1)">▶</button>
+      </div>
+      <div class="investment-grid" id="t5"></div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">表格五：三層交叉最強訊號</div>
+      <div class="three-layer" id="t6"></div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-title">附錄：美股／台股前二十大權值股五行屬性對照表</div>
+      <div style="font-size:0.75rem;color:#8a7a5a;margin-bottom:0.75rem">資料建立於2026年，為靜態快照，不隨命盤生辰或流年切換而變動；權值股排名會隨時間變化，僅供五行分類參考，非操作建議，如隔一段時間查看請自行確認是否需要更新。</div>
+      <div id="stockRefTable"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const HEAVENLY_STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const EARTHLY_BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+const STEM_ELEMENT = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+const BRANCH_ELEMENT = {子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+
+// 農曆轉換：1900-2100 農曆資料表（潤大小月編碼），取自公開通用農曆演算法
+const LUNAR = {
+  info: [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,0x092e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,0x0d520],
+  toObj(y, m, d) {
+    let offset = Math.round((Date.UTC(y,m-1,d) - Date.UTC(1900,0,31))/86400000), i, temp=0;
+    const lDays = (y) => { let i, s=348; for(i=0x8000; i>0x8; i>>=1) s+=((this.info[y-1900] & i) ? 1 : 0); return s + ((this.info[y-1900] & 0xf) ? ((this.info[y-1900]&0x10000)?30:29) : 0) };
+    const mDays = (y, m) => (this.info[y-1900] & (0x10000 >> m)) ? 30 : 29;
+    for(i=1900; i<2101 && offset>0; i++) { temp=lDays(i); offset-=temp; }
+    if(offset<0) { offset+=temp; i--; }
+    const lYear=i, leap=this.info[lYear-1900] & 0xf; let isLeap=false;
+    for(i=1; i<13 && offset>0; i++) {
+      if(leap>0 && i==(leap+1) && !isLeap) { --i; isLeap=true; temp=((this.info[lYear-1900]&0x10000)?30:29); } else { temp=mDays(lYear,i); }
+      if(isLeap && i==(leap+1)) isLeap=false; offset-=temp;
+    }
+    if(offset==0 && leap>0 && i==leap+1) if(isLeap) isLeap=false; else { isLeap=true; --i; }
+    if(offset<0) { offset+=temp; i--; }
+    const lD = offset+1;
+    return { gz: HEAVENLY_STEMS[(lYear-4)%10]+EARTHLY_BRANCHES[(lYear-4)%12], lunarYear: lYear, lunarMonth: i, lunarDay: lD, isLeapMonth: isLeap };
+  }
+};
+
+// 六十甲子納音對應五行局數：水二局/木三局/金四局/土五局/火六局
+const NAYIN_BUREAU = [4,4,6,6,3,3,5,5,4,4,6,6,2,2,5,5,4,4,3,3,2,2,5,5,6,6,3,3,2,2,4,4,6,6,3,3,5,5,4,4,6,6,2,2,5,5,4,4,3,3,2,2,5,5,6,6,3,3,2,2];
+const BUREAU_NAMES = {2:'水二局',3:'木三局',4:'金四局',5:'土五局',6:'火六局'};
+// 十二宮固定相對順序（以命宮為0，往父母/福德方向為正）；遷移宮恰為命宮對宮(+6)
+const PALACE_BY_OFFSET = ['命宮','父母宮','福德宮','田宅宮','官祿宮','交友宮','遷移宮','疾厄宮','財帛宮','子女宮','夫妻宮','兄弟宮'];
+
+function ganzhiIndex(stem, branch) {
+  const s = HEAVENLY_STEMS.indexOf(stem);
+  const b = EARTHLY_BRANCHES.indexOf(branch);
+  for (let idx = s; idx < 60; idx += 10) {
+    if (idx % 12 === b) return idx;
+  }
+  return -1;
+}
+
+// 十四主星安星訣（0=寅宮起算）：紫微逆去天機星，隔一太陽武曲辰，連接天同空二宮，廉貞居處方是真
+const ZIWEI_GROUP = [{name:'紫微',off:0},{name:'天機',off:1},{name:'太陽',off:3},{name:'武曲',off:4},{name:'天同',off:5},{name:'廉貞',off:8}];
+// 天府順行有太陰，貪狼而後巨門臨，隨來天相天梁繼，七殺空三是破軍
+const TIANFU_GROUP = [{name:'天府',off:0},{name:'太陰',off:1},{name:'貪狼',off:2},{name:'巨門',off:3},{name:'天相',off:4},{name:'天梁',off:5},{name:'七殺',off:6},{name:'破軍',off:10}];
+
+// 紫微星定位訣：局數除日數，商數宮前走；若見數無餘，便要起虎口，日數小於局，還直宮中守
+function getZiweiTianfuIndex(bureauNumber, lunarDay) {
+  let offset = -1, quotient, remainder;
+  do {
+    offset++;
+    const divisor = lunarDay + offset;
+    quotient = Math.floor(divisor / bureauNumber);
+    remainder = divisor % bureauNumber;
+  } while (remainder !== 0);
+  quotient = quotient % 12;
+  let ziweiIdx0 = quotient - 1;
+  ziweiIdx0 += (offset % 2 === 0) ? offset : -offset;
+  ziweiIdx0 = ((ziweiIdx0 % 12) + 12) % 12;
+  const tianfuIdx0 = ((12 - ziweiIdx0) % 12 + 12) % 12;
+  return { ziweiIdx0, tianfuIdx0 };
+}
+
+// 0=寅宮起算的index轉成本檔案 0=子 起算的地支index
+function palaceIdx0ToBranchIdx(idx0) {
+  return (idx0 + 2) % 12;
+}
+
+// 十天干四化表（順序：祿權科忌），取自公開驗證過的紫微斗數演算法
+const MUTAGEN_TABLE = {
+  甲: ['廉貞','破軍','武曲','太陽'],
+  乙: ['天機','天梁','紫微','太陰'],
+  丙: ['天同','天機','文昌','廉貞'],
+  丁: ['太陰','天同','天機','巨門'],
+  戊: ['貪狼','太陰','右弼','天機'],
+  己: ['武曲','貪狼','天梁','文曲'],
+  庚: ['太陽','武曲','天府','天同'],
+  辛: ['巨門','太陽','文曲','文昌'],
+  壬: ['天梁','紫微','左輔','武曲'],
+  癸: ['破軍','巨門','太陰','貪狼']
+};
+const MUTAGEN_NAMES = ['化祿','化權','化科','化忌'];
+
+function getMutagens(yearStem) {
+  return MUTAGEN_TABLE[yearStem].map((star, i) => ({ type: MUTAGEN_NAMES[i], star }));
+}
+
+// 四化視覺錨點：化祿/化權(機會)淡綠、化科(中性)淡灰、化忌(風險)淡紅，讓密集文字表格能一眼判讀吉凶
+const MUTAGEN_BADGE_STYLE = {
+  化祿: 'background:#e8f4e8;color:#1a5a1a;', 化權: 'background:#e8f4e8;color:#1a5a1a;',
+  化科: 'background:#f0f0e8;color:#5a5a3a;', 化忌: 'background:#fbecec;color:#a32d2d;'
+};
+
+// 飛星軌跡簡化版：只標記四化是否落在「命財官田兄」五個財務核心宮，不做宮位間多層追蹤(完整版工程量大且無法驗證，見交接檔待辦)
+const FINANCIAL_CORE_PALACES = ['命宮', '財帛宮', '官祿宮', '田宅宮', '兄弟宮'];
+
+// 依天干算四化，並標出落在已定位的十二宮中的哪一宮（大限/流年四化共用同一套十二宮星曜位置，只有天干換算依據不同）
+function formatMutagensByStemPlain(stem, palaces) {
+  return getMutagens(stem).map(m => {
+    const p = palaces.find(pp => pp.stars.includes(m.star));
+    const core = p && FINANCIAL_CORE_PALACES.includes(p.name) ? '🎯' : '';
+    return `${m.star}${m.type}(${p ? p.name : '—'})${core}`;
+  }).join('、');
+}
+
+// 畫面用的HTML版本(帶顏色徽章)，CSV匯出請改用 formatMutagensByStemPlain 避免匯出檔案混入HTML標籤
+function formatMutagensByStem(stem, palaces) {
+  return getMutagens(stem).map(m => {
+    const p = palaces.find(pp => pp.stars.includes(m.star));
+    const style = MUTAGEN_BADGE_STYLE[m.type] || '';
+    const core = p && FINANCIAL_CORE_PALACES.includes(p.name) ? ' 🎯' : '';
+    return `<span style="display:inline-block;padding:0.1rem 0.4rem;border-radius:4px;margin:0.1rem;${style}">${m.star}${m.type}(${p ? p.name : '—'})${core}</span>`;
+  }).join('');
+}
+
+// 十四主星五行屬性表，取自公開驗證過的紫微斗數演算法；太陽、七殺傳統上不指定固定五行
+const STAR_ELEMENT = {
+  紫微:'土', 天機:'木', 太陽:'', 武曲:'金', 天同:'水', 廉貞:'火', 天府:'土',
+  太陰:'水', 貪狼:'水', 巨門:'土', 天相:'水', 天梁:'土', 七殺:'', 破軍:'水'
+};
+
+// 十四主星產業建議參考表（星曜特質延伸出的現代產業對照，屬解讀參考，非公式驗證資料）
+const STAR_SECTOR = {
+  紫微:'大型龍頭股、權值ETF、金融重股', 天機:'軟體服務、AI應用、車聯網、電商',
+  太陽:'全球科技巨頭、新創概念股、太陽能綠能', 武曲:'黃金貴金屬、銀行金控、軍工國防',
+  天同:'定存儲蓄、民生必需品、食品旅遊', 廉貞:'半導體、AI伺服器、線上遊戲',
+  天府:'保險、房地產、傳統金融股', 太陰:'收租型資產、水資源公用事業',
+  貪狼:'原物料期貨、影視娛樂、海外資產', 巨門:'貨運物流、電信通訊、虛擬貨幣',
+  天相:'證券投資平台、房仲加盟連鎖', 天梁:'醫療照護、長照養老、老牌傳產股',
+  七殺:'期貨選擇權、高風險衍生性商品', 破軍:'風險投資、市場反向操作、轉型概念股',
+  左輔:'團隊協作平台、企業服務、人力資源', 右弼:'顧問諮詢、仲介媒合、公關傳播',
+  文昌:'教育出版、文創傳媒、雲端軟體', 文曲:'藝術設計、內容創作、數位行銷'
+};
+// 宮位的財務語意提示（用於風控雷達段落）
+const PALACE_RISK_NOTE = {
+  命宮:'整體決策', 兄弟宮:'現金水位、合夥資金', 夫妻宮:'合資、聯名帳戶',
+  子女宮:'新創投入、槓桿部位', 財帛宮:'現金流、收租型部位', 疾厄宮:'保單保障、醫療準備金',
+  遷移宮:'海外部位、外幣資產', 交友宮:'合作條款、眾籌項目', 官祿宮:'本業收入、事業槓桿',
+  田宅宮:'不動產、大額資產', 福德宮:'情緒化操作、非理性追高', 父母宮:'傳承資產、保守部位'
+};
+
+function buildYearlyAnalysis(yearStem, palaces, resonancePalaceEl) {
+  const muts = getMutagens(yearStem);
+  const findStar = (type) => muts.find(m => m.type === type);
+  const findPalace = (star) => palaces.find(p => p.stars.includes(star));
+
+  const wealthStars = muts.filter(m => m.type === '化祿' || m.type === '化權');
+  const sectors = wealthStars.map(m => STAR_SECTOR[m.star]).filter(Boolean);
+  const uniqueSectors = [...new Set(sectors.join('、').split('、'))].slice(0, 4).join('、');
+  const industry = uniqueSectors || '依命盤星曜個別判斷';
+
+  const luStar = findStar('化祿');
+  let strategy = '本年無明確化祿星可參考';
+  if (luStar) {
+    const p = findPalace(luStar.star);
+    const pName = p ? p.name : '未定位';
+    const isResonant = p && resonancePalaceEl && getElement(p.stem + p.branch).split('').some(ch => resonancePalaceEl.includes(ch));
+    strategy = `${luStar.star}化祿入${pName}${isResonant ? '，與目前大限宮位五行有共振' : ''}，可留意${STAR_SECTOR[luStar.star] || '相關產業'}的布局機會`;
+  }
+
+  const jiStar = findStar('化忌');
+  let riskRadar = '本年無明確化忌星可參考';
+  if (jiStar) {
+    const p = findPalace(jiStar.star);
+    const pName = p ? p.name : '未定位';
+    const riskNote = PALACE_RISK_NOTE[pName] || '相關部位';
+    riskRadar = `${jiStar.star}化忌入${pName}(${riskNote})，留意${STAR_SECTOR[jiStar.star] || '相關產業'}回檔風險，宜避免過度追高`;
+  }
+
+  return { industry, strategy, riskRadar };
+}
+
+// 四態判斷（不設權重版，規則優先順序：風險一票否決 > 爆旺 > 穩健 > 平）
+// 風險：流年化忌沖動該五行，最高風控指標，一律否決
+// 爆旺：長期八字旺該五行(rankIndex<=1) 且 流年動星化祿/化權剛好也是該五行，長短共振
+// 穩健：目前大限(短期)五行 與 流年地支五行 同步，即使今年沒有財星引動也有大運撐腰
+// 平：以上皆非，靜態平衡
+function getYearlyCardSignal(yearStem, element, rankIndex, currentDecadeEl, flowYearEl) {
+  const muts = getMutagens(yearStem).filter(m => STAR_ELEMENT[m.star] === element);
+  const ji = muts.find(m => m.type === '化忌');
+  if (ji) return { level: 'risk', icon: '🚨', label: `${ji.star}化忌沖動`, note: '絕對禁區／嚴格停損位，禁止開槓桿，避免融資期貨', star: ji.star };
+
+  const luQuan = muts.find(m => m.type === '化祿' || m.type === '化權');
+  const isLongTermStrong = rankIndex[element] <= 1;
+  if (luQuan && isLongTermStrong) return { level: 'hot', icon: '🔥', label: `${luQuan.star}${luQuan.type}引動，長短共振`, note: '資金主攻位，適合順勢加碼波段衝刺', star: luQuan.star };
+
+  const isDecadeSync = currentDecadeEl.includes(element) && flowYearEl.includes(element);
+  if (isDecadeSync) return { level: 'stable', icon: '🛡️', label: '大運相挺，不退之兵', note: '核心安全防禦區，適合定時定額長線布局' };
+
+  return { level: 'neutral', icon: '－', label: '', note: '觀望保留位，維持既有配置即可' };
+}
+
+const INVEST_ITEMS = {
+  土: { items:'房地產、REITs', tag:'tag-tu' },
+  金: { items:'黃金、黃金ETF、儲蓄險', tag:'tag-jin' },
+  水: { items:'現金、債券ETF、定存', tag:'tag-shui' },
+  木: { items:'生技股、生技ETF', tag:'tag-mu' },
+  火: { items:'科技股、科技ETF', tag:'tag-huo' }
+};
+const FLOW_COLOR = { risk:'#a32d2d', hot:'#c8922a', stable:'#185fa5', neutral:'#8a7a5a' };
+
+let flowYearState = null;
+let currentFlowYear = null;
+
+// 只算表格四/五需要的流年資料，不重跑整份命盤，供年份切換器使用
+function computeFlowData(flowYear) {
+  const { rankIndex, palace1el, palace2el, sorted } = flowYearState;
+  const flowYearGz = getYearGanzhi(flowYear);
+  const flowYearStem = flowYearGz[0];
+  const flowYearEl = getElement(flowYearGz);
+  const invData = ['土','金','水','木','火'].map(el => {
+    const short = palace1el.includes(el) ? '✅✅' : '⚠️';
+    const mid = palace2el.includes(el) ? '✅✅' : '⚠️';
+    const long = rankIndex[el] <= 1 ? '✅✅' : rankIndex[el] === 2 ? '✅' : '⚠️';
+    const flow = getYearlyCardSignal(flowYearStem, el, rankIndex, palace1el, flowYearEl);
+    return { el, short, mid, long, flow, ...INVEST_ITEMS[el] };
+  });
+
+  const hotEls = invData.filter(d => d.flow.level === 'hot');
+  const riskEls = invData.filter(d => d.flow.level === 'risk');
+  const stableEls = invData.filter(d => d.flow.level === 'stable');
+  let conclusion = `${flowYear}年（${flowYearGz}年）`;
+  const parts = [];
+  if (hotEls.length) parts.push(`🔥 ${hotEls.map(d => `${d.el}(${d.flow.label})`).join('、')}為爆旺主攻位`);
+  if (stableEls.length) parts.push(`🛡️ ${stableEls.map(d => d.el).join('、')}為穩健防禦區`);
+  if (riskEls.length) parts.push(`🚨 ${riskEls.map(d => `${d.el}(${d.flow.label})`).join('、')}為風險區，須嚴格避開`);
+  conclusion += parts.length ? '，' + parts.join('；') : '，五行磁場平穩，維持既有配置即可';
+
+  return { invData, conclusion };
+}
+
+// 資產配置權重：爆旺7分/穩健4分/平1分/風險0分，依分數比例分配100%（權重取自老闆提供的多組配置範例反推、非自訂發明）
+const ALLOC_WEIGHT = { hot: 7, stable: 4, neutral: 1, risk: 0 };
+function computeAllocation(invData) {
+  const totalWeight = invData.reduce((sum, d) => sum + ALLOC_WEIGHT[d.flow.level], 0) || 1;
+  return invData.map(d => ({ el: d.el, level: d.flow.level, pct: Math.round(ALLOC_WEIGHT[d.flow.level] / totalWeight * 100) }));
+}
+
+function buildFlowNarrative(invData, flowYear, flowYearGz) {
+  const hot = invData.filter(d => d.flow.level === 'hot');
+  const stable = invData.filter(d => d.flow.level === 'stable');
+  const risk = invData.filter(d => d.flow.level === 'risk');
+  const segs = [];
+  if (hot.length) {
+    const sectors = [...new Set(hot.map(d => STAR_SECTOR[d.flow.star]).filter(Boolean).join('、').split('、'))].slice(0,3).join('、');
+    segs.push(`${hot.map(d=>d.el).join('、')}因${[...new Set(hot.map(d=>d.flow.star))].join('、')}引動與長期命格共振，為全年資金主攻位，可留意${sectors || '相關產業'}`);
+  }
+  if (stable.length) segs.push(`${stable.map(d=>d.el).join('、')}與大限同步，屬核心防禦區，適合定期定額布局`);
+  if (risk.length) {
+    const sectors = [...new Set(risk.map(d => STAR_SECTOR[d.flow.star]).filter(Boolean).join('、').split('、'))].slice(0,3).join('、');
+    segs.push(`${risk.map(d=>d.el).join('、')}因${[...new Set(risk.map(d=>d.flow.star))].join('、')}化忌沖動，須嚴格避開${sectors || '相關產業'}槓桿部位`);
+  }
+  if (!segs.length) segs.push('五行磁場平穩，維持既有配置即可');
+  return `${flowYear}年（${flowYearGz}年），${segs.join('；')}。`;
+}
+
+function renderTable5Flow(invData, flowYear, flowYearGz) {
+  const flowCardEl = document.getElementById('flowCard');
+  if (flowCardEl) {
+    const luQuanEl = invData.find(d => d.flow.level === 'hot');
+    flowCardEl.innerHTML = `
+      <div class="layer-label">流年微觀 ${flowYear}</div>
+      <div class="layer-element">${flowYearGz}</div>
+      <div style="font-size:0.8rem;color:#6a4a0a;margin-bottom:0.4rem">${getElement(flowYearGz)}</div>
+      <div class="layer-note">${luQuanEl ? '✦ ' + luQuanEl.flow.star + '引動' : '今年無主星四化引動'}</div>
+    `;
+  }
+  const allocYearEl = document.getElementById('allocYearLabel');
+  if (allocYearEl) allocYearEl.textContent = `${flowYear} ${flowYearGz}年`;
+  const allocEl = document.getElementById('allocBars');
+  if (allocEl) {
+    const alloc = computeAllocation(invData);
+    allocEl.innerHTML = alloc.map(a => {
+      const d = invData.find(x => x.el === a.el);
+      let noteText = d.flow.label || d.flow.note;
+      if (d.flow.star && STAR_SECTOR[d.flow.star]) noteText += `／${STAR_SECTOR[d.flow.star]}`;
+      return `
+        <div class="alloc-bar-row">
+          <span>${a.el}</span>
+          <div class="alloc-bar-track"><div class="alloc-bar-fill" style="width:${a.pct}%;background:${FLOW_COLOR[a.level]}"></div></div>
+          <span>${a.pct}%</span>
+        </div>
+        <div class="alloc-bar-note">${d.flow.icon} ${noteText}</div>
+      `;
+    }).join('');
+  }
+  const narrativeYearEl = document.getElementById('narrativeYearLabel');
+  if (narrativeYearEl) narrativeYearEl.textContent = String(flowYear);
+  const narrativeEl = document.getElementById('flowNarrative');
+  if (narrativeEl) narrativeEl.textContent = buildFlowNarrative(invData, flowYear, flowYearGz);
+}
+
+function renderTable4(invData) {
+  let t5 = '';
+  for(const d of invData) {
+    const flowColor = FLOW_COLOR[d.flow.level];
+    t5 += `<div class="inv-card flow-${d.flow.level}">
+      <div class="inv-element"><span class="element-tag ${d.tag}">${d.el}</span></div>
+      <div style="margin-top:0.75rem;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;font-size:0.7rem;text-align:center">
+        <div><div style="color:#8a7a5a">短期</div><div>${d.short}</div></div>
+        <div><div style="color:#8a7a5a">中期</div><div>${d.mid}</div></div>
+        <div><div style="color:#8a7a5a">長期</div><div>${d.long}</div></div>
+        <div><div style="color:#8a7a5a">流年</div><div>${d.flow.icon}</div></div>
+      </div>
+      <div style="margin-top:0.5rem;font-size:0.7rem;color:${flowColor}">${d.flow.label ? '✦ ' + d.flow.label : d.flow.note}</div>
+    </div>`;
+  }
+  document.getElementById('t5').innerHTML = t5;
+}
+
+function stepFlowYear(delta) {
+  if (!flowYearState) { alert('請先產出分析結果'); return; }
+  const target = currentFlowYear + delta;
+  if (target < flowYearState.minYear || target > flowYearState.maxYear) return;
+  currentFlowYear = target;
+  const { invData } = computeFlowData(currentFlowYear);
+  renderTable4(invData);
+  renderTable5Flow(invData, currentFlowYear, getYearGanzhi(currentFlowYear));
+  const labelEl = document.getElementById('flowYearLabel');
+  if (labelEl) labelEl.textContent = `流年 ${currentFlowYear}`;
+}
+
+// 六吉六煞等輔星安星訣（0=寅宮起算），取自公開驗證過的紫微斗數演算法
+// 祿存（按年干）：甲祿到寅宮，乙祿居卯府，丙戊祿在巳，丁己祿在午，庚祿定居申，辛祿酉上補，壬祿亥中藏，癸祿居子戶
+const LU_IDX0_TABLE = {甲:0,乙:1,丙:3,戊:3,丁:4,己:4,庚:6,辛:7,壬:9,癸:10};
+// 天魁天鉞（按年干，直接給地支）：甲戊庚丑未／乙己子申／辛午寅／丙丁亥酉／壬癸卯巳
+const KUI_YUE_TABLE = {甲:['丑','未'],戊:['丑','未'],庚:['丑','未'],乙:['子','申'],己:['子','申'],辛:['午','寅'],丙:['亥','酉'],丁:['亥','酉'],壬:['卯','巳'],癸:['卯','巳']};
+
+function getAuxiliaryStars(yearStem, yearBranch, lunarMonth, hourIdx) {
+  const starsByBranchIdx = {};
+  const addStar = (idx0, name) => {
+    const b = palaceIdx0ToBranchIdx(idx0);
+    if (!starsByBranchIdx[b]) starsByBranchIdx[b] = [];
+    starsByBranchIdx[b].push(name);
+  };
+
+  // 左輔右弼：辰上順正尋左輔，戌上逆正右弼當（按生月）
+  addStar(((2 + (lunarMonth - 1)) % 12 + 12) % 12, '左輔');
+  addStar(((8 - (lunarMonth - 1)) % 12 + 12) % 12, '右弼');
+
+  // 文昌文曲：戌上逆時覓文昌，辰上順時文曲位（按時支）
+  addStar(((8 - hourIdx) % 12 + 12) % 12, '文昌');
+  addStar((2 + hourIdx) % 12, '文曲');
+
+  // 天魁天鉞（按年干）
+  const [kuiBranch, yueBranch] = KUI_YUE_TABLE[yearStem];
+  addStar((EARTHLY_BRANCHES.indexOf(kuiBranch) - 2 + 12) % 12, '天魁');
+  addStar((EARTHLY_BRANCHES.indexOf(yueBranch) - 2 + 12) % 12, '天鉞');
+
+  // 祿存、擎羊、陀羅（按年干，祿前羊刃當、祿後陀羅府）
+  const luIdx0 = LU_IDX0_TABLE[yearStem];
+  addStar(luIdx0, '祿存');
+  addStar((luIdx0 + 1) % 12, '擎羊');
+  addStar((luIdx0 - 1 + 12) % 12, '陀羅');
+
+  // 火星鈴星（按年支＋時支）：申子辰寅戌／寅午戌丑卯／巳酉丑卯戌／亥卯未酉戌
+  const huoLingBase = {
+    子:[0,8], 辰:[0,8], 申:[0,8],
+    寅:[11,1], 午:[11,1], 戌:[11,1],
+    巳:[1,8], 酉:[1,8], 丑:[1,8],
+    亥:[7,8], 卯:[7,8], 未:[7,8]
+  }[yearBranch];
+  addStar((huoLingBase[0] + hourIdx) % 12, '火星');
+  addStar((huoLingBase[1] + hourIdx) % 12, '鈴星');
+
+  // 地空地劫：亥上子時順安劫，逆回便是地空亡（按時支）
+  addStar(((9 - hourIdx) % 12 + 12) % 12, '地空');
+  addStar((9 + hourIdx) % 12, '地劫');
+
+  return starsByBranchIdx;
+}
+
+function getMajorStars(bureauNumber, lunarDay) {
+  const { ziweiIdx0, tianfuIdx0 } = getZiweiTianfuIndex(bureauNumber, lunarDay);
+  const starsByBranchIdx = {};
+  const addStar = (branchIdx, name) => {
+    if (!starsByBranchIdx[branchIdx]) starsByBranchIdx[branchIdx] = [];
+    starsByBranchIdx[branchIdx].push(name);
+  };
+  for (const { name, off } of ZIWEI_GROUP) {
+    const idx0 = ((ziweiIdx0 - off) % 12 + 12) % 12;
+    addStar(palaceIdx0ToBranchIdx(idx0), name);
+  }
+  for (const { name, off } of TIANFU_GROUP) {
+    const idx0 = (tianfuIdx0 + off) % 12;
+    addStar(palaceIdx0ToBranchIdx(idx0), name);
+  }
+  return starsByBranchIdx;
+}
+
+function computeZiweiChart(year, month, day, hour, gender) {
+  const lunar = LUNAR.toObj(year, month, day);
+  const hourIdx = EARTHLY_BRANCHES.indexOf(hour);
+  // 閏月以15日為界：15日(含)前仍算原本月份、15日後算下一個月，避免命宮/身宮宮位偏移一個月
+  const effectiveMonth = (lunar.isLeapMonth && lunar.lunarDay > 15) ? (lunar.lunarMonth % 12 + 1) : lunar.lunarMonth;
+  const monthPalaceIdx = (2 + effectiveMonth - 1) % 12;
+  const lifePalaceIdx = ((monthPalaceIdx - hourIdx) % 12 + 12) % 12;
+  const bodyPalaceIdx = (monthPalaceIdx + hourIdx) % 12;
+
+  const yearStem = lunar.gz[0];
+  const lifePalaceBranch = EARTHLY_BRANCHES[lifePalaceIdx];
+  const lifePalaceStem = getMonthStem(yearStem, lifePalaceBranch);
+  const bodyPalaceBranch = EARTHLY_BRANCHES[bodyPalaceIdx];
+  const bodyPalaceStem = getMonthStem(yearStem, bodyPalaceBranch);
+
+  const bureauNumber = NAYIN_BUREAU[ganzhiIndex(lifePalaceStem, lifePalaceBranch)];
+  const bureauName = BUREAU_NAMES[bureauNumber];
+
+  const isYangYear = ['甲','丙','戊','庚','壬'].includes(yearStem);
+  const isMale = gender === 'male';
+  const forward = (isYangYear && isMale) || (!isYangYear && !isMale);
+
+  const starsByBranchIdx = getMajorStars(bureauNumber, lunar.lunarDay);
+  const auxStarsByBranchIdx = getAuxiliaryStars(yearStem, lunar.gz[1], lunar.lunarMonth, hourIdx);
+  for (const b in auxStarsByBranchIdx) {
+    starsByBranchIdx[b] = (starsByBranchIdx[b] || []).concat(auxStarsByBranchIdx[b]);
+  }
+
+  const mutagens = getMutagens(yearStem);
+
+  const palaces = [];
+  for (let k = 0; k < 12; k++) {
+    const branchIdx = ((lifePalaceIdx + (forward ? k : -k)) % 12 + 12) % 12;
+    const branch = EARTHLY_BRANCHES[branchIdx];
+    const stem = getMonthStem(yearStem, branch);
+    const ageStart = bureauNumber + k * 10;
+    const ageEnd = ageStart + 9;
+    const stars = starsByBranchIdx[branchIdx] || [];
+    const palaceMutagens = mutagens.filter(m => stars.includes(m.star)).map(m => m.type);
+    palaces.push({
+      name: PALACE_BY_OFFSET[k], stem, branch,
+      ageStart, ageEnd,
+      yearStart: year + ageStart - 1, yearEnd: year + ageEnd - 1,
+      stars, mutagens: palaceMutagens
+    });
+  }
+
+  return {
+    lunar, yearStem,
+    lifePalace: { stem: lifePalaceStem, branch: lifePalaceBranch },
+    bodyPalace: { stem: bodyPalaceStem, branch: bodyPalaceBranch },
+    bureau: { number: bureauNumber, name: bureauName },
+    direction: forward ? '順行' : '逆行',
+    palaces, mutagens
+  };
+}
+
+
+function getYearGanzhi(year) {
+  const stemIdx = (year - 4) % 10;
+  const branchIdx = (year - 4) % 12;
+  return HEAVENLY_STEMS[stemIdx] + EARTHLY_BRANCHES[branchIdx];
+}
+
+function getElement(gz) {
+  const s = STEM_ELEMENT[gz[0]] || '';
+  const b = BRANCH_ELEMENT[gz[1]] || '';
+  if (s === b) return s;
+  return s + b;
+}
+
+function getElementTag(el) {
+  if (el.includes('土')) return 'tu';
+  if (el.includes('金')) return 'jin';
+  if (el.includes('水')) return 'shui';
+  if (el.includes('木')) return 'mu';
+  return 'huo';
+}
+
+const HIDDEN_STEMS = {
+  子: [['癸',1.0]],
+  丑: [['己',0.6],['癸',0.3],['辛',0.1]],
+  寅: [['甲',0.6],['丙',0.3],['戊',0.1]],
+  卯: [['乙',1.0]],
+  辰: [['戊',0.6],['乙',0.3],['癸',0.1]],
+  巳: [['丙',0.6],['庚',0.3],['戊',0.1]],
+  午: [['丁',0.7],['己',0.3]],
+  未: [['己',0.6],['丁',0.3],['乙',0.1]],
+  申: [['庚',0.6],['壬',0.3],['戊',0.1]],
+  酉: [['辛',1.0]],
+  戌: [['戊',0.6],['辛',0.3],['丁',0.1]],
+  亥: [['壬',0.7],['甲',0.3]]
+};
+
+const SEASON_TABLE = {
+  寅: {木:1.4,火:1.1,水:0.9,金:0.7,土:0.5},
+  卯: {木:1.4,火:1.1,水:0.9,金:0.7,土:0.5},
+  巳: {火:1.4,土:1.1,木:0.9,水:0.7,金:0.5},
+  午: {火:1.4,土:1.1,木:0.9,水:0.7,金:0.5},
+  申: {金:1.4,水:1.1,土:0.9,火:0.7,木:0.5},
+  酉: {金:1.4,水:1.1,土:0.9,火:0.7,木:0.5},
+  亥: {水:1.4,木:1.1,金:0.9,土:0.7,火:0.5},
+  子: {水:1.4,木:1.1,金:0.9,土:0.7,火:0.5},
+  辰: {土:1.4,金:1.1,火:0.9,木:0.7,水:0.5},
+  戌: {土:1.4,金:1.1,火:0.9,木:0.7,水:0.5},
+  丑: {土:1.4,金:1.1,火:0.9,木:0.7,水:0.5},
+  未: {土:1.4,金:1.1,火:0.9,木:0.7,水:0.5}
+};
+
+const MONTH_STEM_BASE = {甲:'丙',己:'丙',乙:'戊',庚:'戊',丙:'庚',辛:'庚',丁:'壬',壬:'壬',戊:'甲',癸:'甲'};
+const HOUR_STEM_BASE = {甲:'甲',己:'甲',乙:'丙',庚:'丙',丙:'戊',辛:'戊',丁:'庚',壬:'庚',戊:'壬',癸:'壬'};
+const GENERATOR_OF = {木:'水',火:'木',土:'火',金:'土',水:'金'};
+
+const JIE_CUTOFFS = [
+  {m:1,d:6,branch:'丑'}, {m:2,d:4,branch:'寅'}, {m:3,d:6,branch:'卯'}, {m:4,d:5,branch:'辰'},
+  {m:5,d:6,branch:'巳'}, {m:6,d:6,branch:'午'}, {m:7,d:7,branch:'未'}, {m:8,d:8,branch:'申'},
+  {m:9,d:8,branch:'酉'}, {m:10,d:8,branch:'戌'}, {m:11,d:7,branch:'亥'}, {m:12,d:7,branch:'子'}
+];
+
+// 節氣邊界為近似平均日期（各年實際節氣日期會有±1~2天浮動），非精確天文計算
+function getBaziMonthBranch(month, day) {
+  let result = '子';
+  for (const c of JIE_CUTOFFS) {
+    if (month > c.m || (month === c.m && day >= c.d)) result = c.branch;
+  }
+  return result;
+}
+
+// 八字換年以立春為界，而非農曆正月初一
+function getBaziYear(year, month, day) {
+  return (month < 2 || (month === 2 && day < 4)) ? year - 1 : year;
+}
+
+function getJDN(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12 * a - 3;
+  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+}
+
+function getDayGanzhi(y, m, d) {
+  const idx = ((getJDN(y, m, d) + 49) % 60 + 60) % 60;
+  return HEAVENLY_STEMS[idx % 10] + EARTHLY_BRANCHES[idx % 12];
+}
+
+function getMonthStem(yearStem, monthBranch) {
+  const baseIdx = HEAVENLY_STEMS.indexOf(MONTH_STEM_BASE[yearStem]);
+  const branchIdx = EARTHLY_BRANCHES.indexOf(monthBranch);
+  const offset = ((branchIdx - 2) % 12 + 12) % 12;
+  return HEAVENLY_STEMS[(baseIdx + offset) % 10];
+}
+
+function getHourStem(dayStem, hourBranch) {
+  const baseIdx = HEAVENLY_STEMS.indexOf(HOUR_STEM_BASE[dayStem]);
+  const branchIdx = EARTHLY_BRANCHES.indexOf(hourBranch);
+  return HEAVENLY_STEMS[(baseIdx + branchIdx) % 10];
+}
+
+function calcBazi(year, month, day, hour) {
+  const baziYear = getBaziYear(year, month, day);
+  const yearStem = HEAVENLY_STEMS[((baziYear - 4) % 10 + 10) % 10];
+  const yearBranch = EARTHLY_BRANCHES[((baziYear - 4) % 12 + 12) % 12];
+
+  const monthBranch = getBaziMonthBranch(month, day);
+  const monthStem = getMonthStem(yearStem, monthBranch);
+
+  const dayGanzhi = getDayGanzhi(year, month, day);
+  const dayStem = dayGanzhi[0];
+  const dayBranch = dayGanzhi[1];
+
+  const hourStem = getHourStem(dayStem, hour);
+
+  // 月柱在四柱中權重加倍，反映「月令」對五行力量的主導地位
+  const pillars = [
+    { stem: yearStem, branch: yearBranch, weight: 1 },
+    { stem: monthStem, branch: monthBranch, weight: 2 },
+    { stem: dayStem, branch: dayBranch, weight: 1 },
+    { stem: hourStem, branch: hour, weight: 1 }
+  ];
+
+  const raw = {木:0, 火:0, 土:0, 金:0, 水:0};
+  for (const p of pillars) {
+    raw[STEM_ELEMENT[p.stem]] += 1 * p.weight;
+    for (const [stem, w] of HIDDEN_STEMS[p.branch]) {
+      raw[STEM_ELEMENT[stem]] += w * p.weight;
+    }
+  }
+
+  // 套用月令季節旺相休囚死倍率
+  const season = SEASON_TABLE[monthBranch];
+  const counts = {};
+  for (const el of Object.keys(raw)) {
+    counts[el] = raw[el] * season[el];
+  }
+
+  const dayMasterElement = STEM_ELEMENT[dayStem];
+  const generator = GENERATOR_OF[dayMasterElement];
+  const total = Object.values(counts).reduce((a,b) => a+b, 0);
+  const supportive = counts[dayMasterElement] + counts[generator];
+  const bodyStrength = (supportive / total) >= 0.5 ? '身強' : '身弱';
+
+  return {
+    counts,
+    pillars: { year: yearStem+yearBranch, month: monthStem+monthBranch, day: dayStem+dayBranch, hour: hourStem+hour },
+    dayMaster: dayStem,
+    dayMasterElement,
+    bodyStrength
+  };
+}
+
+function getStrength(count, total) {
+  const r = count / Math.max(total, 1);
+  if(r >= 0.25) return '⭐⭐⭐ 旺';
+  if(r >= 0.15) return '⭐⭐ 中';
+  return '⭐ 弱';
+}
+
+function getInvestment(element) {
+  return INVEST_ITEMS[element] || { items:'—', tag:'' };
+}
+
+let lastResult = null;
+
+function isValidBirthDate(year, month, day) {
+  if (!Number.isInteger(year) || year < 1900 || year > 2100) return false;
+  if (!Number.isInteger(month) || month < 1 || month > 12) return false;
+  if (!Number.isInteger(day) || day < 1) return false;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  return day <= daysInMonth;
+}
+
+function generate() {
+  const year = parseInt(document.getElementById('year').value);
+  const month = parseInt(document.getElementById('month').value);
+  const day = parseInt(document.getElementById('day').value);
+  const hour = document.getElementById('hour').value;
+  const gender = document.getElementById('gender').value;
+
+  if (!isValidBirthDate(year, month, day)) {
+    alert('生辰日期不合法，請確認年份(1900~2100)、月份(1~12)、日期是否對應該月天數（例如2月沒有30號）。');
+    return;
+  }
+
+  const ziwei = computeZiweiChart(year, month, day, hour, gender);
+  const nowYear = new Date().getFullYear();
+  const currentAge = nowYear - year + 1;
+  let curIdx = ziwei.palaces.findIndex(p => currentAge >= p.ageStart && currentAge <= p.ageEnd);
+  if (curIdx < 0) curIdx = 0;
+  const nextIdx = (curIdx + 1) % ziwei.palaces.length;
+  const curDecade = ziwei.palaces[curIdx];
+  const nextDecade = ziwei.palaces[nextIdx];
+
+  const palace1 = curDecade.name;
+  const palace1el = getElement(curDecade.stem + curDecade.branch);
+  const p1start = curDecade.yearStart;
+  const p1end = curDecade.yearEnd;
+  const palace2 = nextDecade.name;
+  const palace2el = getElement(nextDecade.stem + nextDecade.branch);
+  const p2start = nextDecade.yearStart;
+  const p2end = nextDecade.yearEnd;
+
+  const lifePalaceStars = (ziwei.palaces.find(p => p.name === '命宮') || {}).stars || [];
+  const mutagenSummary = ziwei.mutagens.map(m => {
+    const p = ziwei.palaces.find(pp => pp.stars.includes(m.star));
+    const el = STAR_ELEMENT[m.star];
+    const core = p && FINANCIAL_CORE_PALACES.includes(p.name) ? '🎯' : '';
+    return `${m.star}${m.type}${el ? '（'+el+'）' : ''}(${p ? p.name : '—'})${core}`;
+  }).join('、');
+  const wealthMutagens = ziwei.mutagens.filter(m => m.type === '化祿' || m.type === '化權');
+  const wealthSummary = wealthMutagens.map(m => {
+    const p = ziwei.palaces.find(pp => pp.stars.includes(m.star));
+    const el = STAR_ELEMENT[m.star] || '無固定五行';
+    return `${m.star}${m.type}→${el}（${p ? p.name : '—'}）`;
+  }).join('、') || '無';
+  document.getElementById('ziweiInfo').innerHTML = `命宮：${ziwei.lifePalace.stem}${ziwei.lifePalace.branch}${lifePalaceStars.length ? '（' + lifePalaceStars.join('、') + '）' : ''}　身宮：${ziwei.bodyPalace.stem}${ziwei.bodyPalace.branch}　｜　${ziwei.bureau.name}　｜　大限${ziwei.direction}　｜　農曆：${ziwei.lunar.gz}年${ziwei.lunar.isLeapMonth?'閏':''}${ziwei.lunar.lunarMonth}月${ziwei.lunar.lunarDay}日<br>本命四化：${mutagenSummary}<br>財運星曜(化祿/化權)：${wealthSummary}`;
+  let t0 = '<tr><th>宮位</th><th>干支</th><th>主星</th><th>起訖歲數(虛歲)</th><th>西元年</th></tr>';
+  const csv0 = [];
+  for (const p of ziwei.palaces) {
+    const isCur = p === curDecade;
+    const starsText = p.stars.map(s => {
+      const m = ziwei.mutagens.find(mm => mm.star === s);
+      return m ? `${s}(${m.type.replace('化','')})` : s;
+    }).join('、') || '—';
+    t0 += `<tr${isCur ? ' style="background:#f4f0e8;font-weight:600"' : ''}><td>${p.name}</td><td>${p.stem}${p.branch}</td><td>${starsText}</td><td>${p.ageStart}~${p.ageEnd}</td><td>${p.yearStart}~${p.yearEnd}</td></tr>`;
+    csv0.push([p.name, p.stem+p.branch, starsText, `${p.ageStart}~${p.ageEnd}`, `${p.yearStart}~${p.yearEnd}`]);
+  }
+  document.getElementById('t0').innerHTML = t0;
+
+  const bazi = calcBazi(year, month, day, hour);
+  const counts = bazi.counts;
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+  document.getElementById('baziInfo').innerHTML = `四柱：年柱 ${bazi.pillars.year}　月柱 ${bazi.pillars.month}　日柱 ${bazi.pillars.day}（日主）　時柱 ${bazi.pillars.hour}　｜　身強身弱：<b>${bazi.bodyStrength}</b>`;
+
+  const elements = ['土','金','木','火','水'];
+
+  const sorted = [...elements].sort((a,b) => (counts[b]||0) - (counts[a]||0));
+
+  let t1 = '<tr><th>五行</th><th>強弱</th><th>長期投資方向</th></tr>';
+  const csv1 = [];
+  for(const el of sorted) {
+    const c = counts[el] || 0;
+    const str = getStrength(c, total);
+    const inv = getInvestment(el);
+    t1 += `<tr><td><span class="element-tag tag-${getElementTag(el)}">${el}</span></td><td>${str}</td><td style="font-size:0.8rem;color:#4a4a4a">${inv.items}</td></tr>`;
+    csv1.push([el, str, inv.items]);
+  }
+  document.getElementById('t1').innerHTML = t1;
+
+  let t3 = '<tr><th>期間</th><th>維度</th><th>大限宮位</th><th>五行</th><th>大限四化</th><th>引動產業</th><th>核心策略</th><th>風控雷達</th></tr>';
+  const shortMutagens = formatMutagensByStem(curDecade.stem, ziwei.palaces);
+  const midMutagens = formatMutagensByStem(nextDecade.stem, ziwei.palaces);
+  const shortAnalysis = buildYearlyAnalysis(curDecade.stem, ziwei.palaces);
+  const midAnalysis = buildYearlyAnalysis(nextDecade.stem, ziwei.palaces);
+  t3 += `<tr><td>${p1start}～${p1end}</td><td>短期</td><td>${palace1}</td><td><span class="element-tag tag-${getElementTag(palace1el)}">${palace1el}</span></td><td style="font-size:0.7rem">${shortMutagens}</td><td style="font-size:0.75rem">${shortAnalysis.industry}</td><td style="font-size:0.75rem">${shortAnalysis.strategy}</td><td style="font-size:0.75rem">${shortAnalysis.riskRadar}</td></tr>`;
+  t3 += `<tr><td>${p2start}～${p2end}</td><td>中期</td><td>${palace2}</td><td><span class="element-tag tag-${getElementTag(palace2el)}">${palace2el}</span></td><td style="font-size:0.7rem">${midMutagens}</td><td style="font-size:0.75rem">${midAnalysis.industry}</td><td style="font-size:0.75rem">${midAnalysis.strategy}</td><td style="font-size:0.75rem">${midAnalysis.riskRadar}</td></tr>`;
+  document.getElementById('t3').innerHTML = t3;
+  const csv3 = [
+    [`${p1start}～${p1end}`, '短期', palace1, palace1el, formatMutagensByStemPlain(curDecade.stem, ziwei.palaces), shortAnalysis.industry, shortAnalysis.strategy, shortAnalysis.riskRadar],
+    [`${p2start}～${p2end}`, '中期', palace2, palace2el, formatMutagensByStemPlain(nextDecade.stem, ziwei.palaces), midAnalysis.industry, midAnalysis.strategy, midAnalysis.riskRadar]
+  ];
+
+  let t4 = '<tr><th>年份</th><th>干支</th><th>五行</th><th>流年四化</th><th>引動產業</th><th>核心策略</th><th>風控雷達</th></tr>';
+  const csv4 = [];
+  for(let y = nowYear; y <= p2start; y++) {
+    const gz = getYearGanzhi(y);
+    const el = getElement(gz);
+    const inShort = y <= p1end;
+    const resonancePalaceEl = inShort ? palace1el : palace2el;
+    const yearMutagens = formatMutagensByStem(gz[0], ziwei.palaces);
+    const { industry, strategy, riskRadar } = buildYearlyAnalysis(gz[0], ziwei.palaces, resonancePalaceEl);
+    t4 += `<tr><td>${y}</td><td>${gz}</td><td><span class="element-tag tag-${getElementTag(el)}">${el}</span></td><td style="font-size:0.7rem">${yearMutagens}</td><td style="font-size:0.75rem">${industry}</td><td style="font-size:0.75rem">${strategy}</td><td style="font-size:0.75rem">${riskRadar}</td></tr>`;
+    csv4.push([y, gz, el, formatMutagensByStemPlain(gz[0], ziwei.palaces), industry, strategy, riskRadar]);
+  }
+  document.getElementById('t4').innerHTML = t4;
+
+  const rankIndex = {};
+  sorted.forEach((el, i) => rankIndex[el] = i);
+
+  const longEl = sorted.slice(0,2).map(e=>e).join('＋');
+  const shortSignal = shortAnalysis.industry;
+
+  flowYearState = { rankIndex, palace1el, palace2el, sorted, minYear: nowYear, maxYear: p2start };
+  currentFlowYear = nowYear;
+  const { invData } = computeFlowData(nowYear);
+  const csv5 = invData.map(d => [d.el, d.short, d.mid, d.long, `${d.flow.icon}${d.flow.label ? ' '+d.flow.label : ' '+d.flow.note}`]);
+  renderTable4(invData);
+  document.getElementById('flowYearLabel').textContent = `流年 ${nowYear}`;
+
+  document.getElementById('t6').innerHTML = `
+    <div class="layer-card short">
+      <div class="layer-label">中期大限 ${p1start}～${p1end}</div>
+      <div class="layer-element">${palace1el}</div>
+      <div style="font-size:0.8rem;color:#2a6a2a;margin-bottom:0.4rem">${palace1}</div>
+      <div class="layer-note">${shortSignal}</div>
+    </div>
+    <div class="layer-card long">
+      <div class="layer-label">長期命格</div>
+      <div class="layer-element">${longEl}</div>
+      <div style="font-size:0.8rem;color:#6a4a0a;margin-bottom:0.4rem">命格核心</div>
+      <div class="layer-note">🥇 ${sorted[0]}旺為主軸</div>
+    </div>
+    <div class="layer-card flow" id="flowCard"></div>
+    <div style="grid-column:1/-1;margin-top:0.5rem;padding:0.9rem;background:#faf8f4;border-radius:10px;border:0.5px solid #e0d8c8">
+      <div style="font-size:0.7rem;letter-spacing:0.1em;color:#8a7a5a;text-transform:uppercase;margin-bottom:0.6rem">【<span id="allocYearLabel"></span> 最終資產配置建議】</div>
+      <div id="allocBars"></div>
+      <div style="font-size:0.65rem;color:#a89878;margin-top:0.3rem">＊依爆旺/穩健/平/風險權重比例換算，非固定百分比</div>
+    </div>
+    <div style="grid-column:1/-1;margin-top:0.5rem;padding:0.9rem;background:#faf8f4;border-radius:10px;border:0.5px solid #e0d8c8;font-size:0.85rem;line-height:1.6">
+      <div style="font-size:0.7rem;letter-spacing:0.1em;color:#8a7a5a;text-transform:uppercase;margin-bottom:0.4rem">🎯 <span id="narrativeYearLabel"></span>操盤參考方向</div>
+      <div id="flowNarrative"></div>
+    </div>
+  `;
+  renderTable5Flow(invData, nowYear, getYearGanzhi(nowYear));
+  const conclusion = buildFlowNarrative(invData, nowYear, getYearGanzhi(nowYear));
+  const csv6 = [
+    ['中期大限', `${p1start}～${p1end}`, palace1el, palace1, shortSignal],
+    ['長期命格', '命格', longEl, '命格核心', `${sorted[0]}旺為主軸`],
+    ['流年微觀', String(nowYear), '', '', conclusion]
+  ];
+
+  lastResult = {
+    bazi, ziwei,
+    headers: {
+      t0: ['宮位','干支','主星','起訖歲數(虛歲)','西元年'],
+      t1: ['五行','強弱','長期投資方向'],
+      t3: ['期間','維度','大限宮位','五行','大限四化','引動產業','核心策略','風控雷達'],
+      t4: ['年份','干支','五行','流年四化','引動產業','核心策略','風控雷達'],
+      t5: ['五行','短期','中期','長期','流年'],
+      t6: ['期間類型','年份區間','五行','宮位/命格','訊號']
+    },
+    rows: { t0: csv0, t1: csv1, t3: csv3, t4: csv4, t5: csv5, t6: csv6 }
+  };
+
+  document.getElementById('results').className = 'results show';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+const CDN_FAIL_MSG = '匯出失敗：需要載入外部資源(html2canvas/jsPDF)，請確認網路連線後再試一次。';
+
+// 表格/卡片區塊平常用overflow-x:auto框內捲動避免撐壞畫面，但這樣一來html2canvas抓取時，
+// 無論windowWidth設多寬，只要容器本身仍是overflow-x:auto，就可能量不準或裁切內容(電腦版寬螢幕也一樣會發生，不只手機)。
+// 匯出時改成：暫時真的把容器撐開成可見的完整寬度(overflow改visible)，直接量出DOM實際需要的寬度，擷取完再還原，不用用猜的
+async function withExportWideMode(fn) {
+  const style = document.createElement('style');
+  style.id = 'exportWideModeStyle';
+  style.textContent = `
+    #results .result-section { overflow-x: visible !important; }
+    #results, #results .right-panel, .right-panel, .layout, .container { width: max-content !important; max-width: none !important; }
+  `;
+  document.head.appendChild(style);
+  try {
+    const width = Math.ceil(document.getElementById('results').scrollWidth) + 40;
+    return await fn(width);
+  } finally {
+    style.remove();
+  }
+}
+
+// 手機瀏覽器對畫布(canvas)總像素量有上限，超過會直接產生失敗(iOS Safari常見「作業失敗」)。
+// 內容本身是長頁面+這次撐寬後尺寸都不小，若照預設用devicePixelRatio(手機retina螢幕常是2~3倍)去放大，很容易超過上限。
+// 這裡改成依實際內容尺寸換算一個安全的縮放倍率，寧可畫質稍微保守一點也要能真的匯出成功。
+function getSafeExportScale(captureWidth, contentHeight) {
+  const preferred = Math.min(window.devicePixelRatio || 1, 2);
+  const maxDimension = 4000;
+  const maxArea = 12 * 1024 * 1024;
+  let scale = preferred;
+  if (captureWidth * scale > maxDimension) scale = maxDimension / captureWidth;
+  if (contentHeight * scale > maxDimension * 4) scale = Math.min(scale, (maxDimension * 4) / contentHeight);
+  if (captureWidth * contentHeight * scale * scale > maxArea) scale = Math.sqrt(maxArea / (captureWidth * contentHeight));
+  return Math.max(0.5, scale);
+}
+
+// 找出畫布上「整列都是背景色」的安全分頁點，避免PDF分頁剛好切在表格列/卡片中間
+function isRowBackground(ctx, canvasWidth, y, bg) {
+  const step = Math.max(1, Math.floor(canvasWidth / 25));
+  for (let x = 0; x < canvasWidth; x += step) {
+    const d = ctx.getImageData(x, y, 1, 1).data;
+    if (Math.abs(d[0] - bg[0]) > 10 || Math.abs(d[1] - bg[1]) > 10 || Math.abs(d[2] - bg[2]) > 10) return false;
+  }
+  return true;
+}
+function findSafeBreakY(ctx, canvasWidth, canvasHeight, naiveY, bg, searchRange) {
+  const y0 = Math.round(naiveY);
+  for (let shift = 0; shift <= searchRange; shift += 3) {
+    const down = y0 + shift, up = y0 - shift;
+    if (down < canvasHeight && isRowBackground(ctx, canvasWidth, down, bg)) return down;
+    if (up > 0 && isRowBackground(ctx, canvasWidth, up, bg)) return up;
+  }
+  return y0;
+}
+
+async function exportPDF() {
+  if (!lastResult) { alert('請先產出分析結果'); return; }
+  try {
+    await withExportWideMode(async (captureWidth) => {
+      const contentHeight = document.getElementById('results').scrollHeight;
+      const scale = getSafeExportScale(captureWidth, contentHeight);
+      const canvas = await html2canvas(document.getElementById('results'), { backgroundColor: '#f8f6f0', scale, windowWidth: captureWidth, width: captureWidth });
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgWidth = pageWidth;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const ctx = canvas.getContext('2d');
+      const bg = ctx.getImageData(2, 2, 1, 1).data;
+      const searchRangePx = Math.round(canvas.height * 0.035);
+
+      let consumedHeight = 0;
+      let pageNum = 0;
+      while (consumedHeight < imgHeight - 0.5) {
+        if (pageNum > 0) pdf.addPage();
+        const remaining = imgHeight - consumedHeight;
+        let thisPageHeight = Math.min(pageHeight, remaining);
+        if (thisPageHeight < remaining) {
+          const naiveCanvasY = (consumedHeight + thisPageHeight) * canvas.height / imgHeight;
+          const safeCanvasY = findSafeBreakY(ctx, canvas.width, canvas.height, naiveCanvasY, bg, searchRangePx);
+          const adjustedHeight = (safeCanvasY * imgHeight / canvas.height) - consumedHeight;
+          if (adjustedHeight > pageHeight * 0.5) thisPageHeight = adjustedHeight;
+        }
+        pdf.addImage(imgData, 'JPEG', 0, -consumedHeight, imgWidth, imgHeight);
+        consumedHeight += thisPageHeight;
+        pageNum++;
+      }
+      pdf.save('紫微五行投資分析.pdf');
+    });
+  } catch (e) {
+    alert(CDN_FAIL_MSG);
+  }
+}
+
+async function exportPNG() {
+  if (!lastResult) { alert('請先產出分析結果'); return; }
+  try {
+    await withExportWideMode(async (captureWidth) => {
+      const contentHeight = document.getElementById('results').scrollHeight;
+      const scale = getSafeExportScale(captureWidth, contentHeight);
+      const canvas = await html2canvas(document.getElementById('results'), { backgroundColor: '#f8f6f0', scale, windowWidth: captureWidth, width: captureWidth });
+      const link = document.createElement('a');
+      link.download = '紫微五行投資分析.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  } catch (e) {
+    alert(CDN_FAIL_MSG);
+  }
+}
+
+// 產生給Google AI等外部工具用的提示詞，自動帶入目前算好的命宮/本命四化/目前大限，
+// 使用者不用手動抄數字；股票分類問題保持通用模板(公司名稱/代碼留白)，讓使用者自己填要問的個股
+function copyAIPrompt() {
+  if (!lastResult) { alert('請先產出分析結果'); return; }
+  const { ziwei } = lastResult;
+  const nowYear = new Date().getFullYear();
+  const curDecade = ziwei.palaces.find(p => nowYear >= p.yearStart && nowYear <= p.yearEnd) || ziwei.palaces[0];
+  const curDecadeEl = getElement(curDecade.stem + curDecade.branch);
+  const lifePalaceStars = (ziwei.palaces.find(p => p.name === '命宮') || {}).stars || [];
+  const mutagenText = ziwei.mutagens.map(m => {
+    const p = ziwei.palaces.find(pp => pp.stars.includes(m.star));
+    const el = STAR_ELEMENT[m.star];
+    return `${m.star}${m.type}${el ? '（' + el + '）' : ''}(${p ? p.name : '—'})`;
+  }).join('、');
+
+  const prompt = `以下是我的紫微斗數命盤資料(已用真實命盤驗證過，直接採用，不需要重新計算)：
+命宮：${ziwei.lifePalace.stem}${ziwei.lifePalace.branch}（${lifePalaceStars.join('、') || '—'}）｜身宮：${ziwei.bodyPalace.stem}${ziwei.bodyPalace.branch}｜${ziwei.bureau.name}｜大限${ziwei.direction}
+本命四化：${mutagenText}
+目前大限：${curDecade.yearStart}~${curDecade.yearEnd} ${curDecade.name} ${curDecadeEl}
+
+另外，美股(公司名稱或股票符號) 這家公司，
+如果以「產業性質對應北派紫微斗數的四化邏輯」分類，
+應該歸類為金木水火土中的哪一個？
+請說明分類理由 (例如 :主要營收來源、產業本質)。`;
+
+  const done = () => alert('已複製提示詞，可直接貼到Google AI等工具詢問。');
+  const fail = () => window.prompt('自動複製失敗，請手動全選以下文字複製：', prompt);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(prompt).then(done).catch(fail);
+  } else {
+    fail();
+  }
+}
+
+function exportCSV() {
+  if (!lastResult) { alert('請先產出分析結果'); return; }
+  const esc = (v) => `"${String(v).replace(/"/g,'""')}"`;
+  const lines = [];
+  lines.push(esc('四柱') + ',' + esc(`${lastResult.bazi.pillars.year} ${lastResult.bazi.pillars.month} ${lastResult.bazi.pillars.day}(日主) ${lastResult.bazi.pillars.hour}`) + ',' + esc('身強身弱') + ',' + esc(lastResult.bazi.bodyStrength));
+  lines.push(esc('命宮') + ',' + esc(lastResult.ziwei.lifePalace.stem + lastResult.ziwei.lifePalace.branch) + ',' + esc('身宮') + ',' + esc(lastResult.ziwei.bodyPalace.stem + lastResult.ziwei.bodyPalace.branch) + ',' + esc(lastResult.ziwei.bureau.name) + ',' + esc('大限' + lastResult.ziwei.direction));
+  lines.push('');
+  const sections = [
+    ['表格零：紫微定盤（自動）', 't0'],
+    ['表格一：純五行分析（長期）', 't1'],
+    ['表格二：紫微大限', 't3'],
+    ['表格三：紫微流年操作方向', 't4'],
+    ['表格四：紫微大限×下一大限×五行', 't5'],
+    ['表格五：三層交叉最強訊號', 't6']
+  ];
+  for (const [title, key] of sections) {
+    lines.push(title);
+    lines.push(lastResult.headers[key].map(esc).join(','));
+    for (const row of lastResult.rows[key]) {
+      lines.push(row.map(esc).join(','));
+    }
+    lines.push('');
+  }
+  const csvContent = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '紫微五行投資分析.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// 美股/台股前二十大權值股五行屬性對照表（靜態參考資料，非命盤運算結果；權值排名會隨時間變化，五行歸屬屬解讀參考非公式驗證資料）
+const globalStockDatabase = [
+  { code:'2330', name:'台積電', market:'TW', five_elements:['金'], description:'全球晶圓代工龍頭，本業為精密晶圓製造(金)' },
+  { code:'2317', name:'鴻海', market:'TW', five_elements:['金'], description:'全球電子代工巨頭，剛性硬體製造與電動車底盤' },
+  { code:'2881', name:'富邦金', market:'TW', five_elements:['金'], description:'指標性大型金融金控，主導證券、銀行與壽險' },
+  { code:'2882', name:'國泰金', market:'TW', five_elements:['金'], description:'指標性大型金融金控，主導證券、銀行與壽險' },
+  { code:'2891', name:'中信金', market:'TW', five_elements:['金'], description:'消金與銀行龍頭，資金流通與融資信貸' },
+  { code:'2886', name:'兆豐金', market:'TW', five_elements:['金'], description:'官股金控龍頭，外匯業務與企金剛性需求' },
+  { code:'2454', name:'聯發科', market:'TW', five_elements:['火'], description:'手機晶片與AI邊緣運算設計' },
+  { code:'2308', name:'台達電', market:'TW', five_elements:['火'], description:'電源供應器、綠能、電動車充電樁電力轉換' },
+  { code:'3008', name:'大立光', market:'TW', five_elements:['火'], description:'高階光學鏡頭' },
+  { code:'3017', name:'奇鋐', market:'TW', five_elements:['火'], description:'AI伺服器散熱模組' },
+  { code:'2382', name:'廣達', market:'TW', five_elements:['火'], description:'AI伺服器代工與雲端運算設備' },
+  { code:'2412', name:'中華電', market:'TW', five_elements:['土'], description:'國家級電信基礎建設，穩固抗通膨防禦標的' },
+  { code:'1301', name:'台塑', market:'TW', five_elements:['土'], description:'傳統塑膠石化工業，基礎原物料' },
+  { code:'1101', name:'台泥', market:'TW', five_elements:['土'], description:'水泥、儲能與基礎土木營建材料' },
+  { code:'2603', name:'長榮', market:'TW', five_elements:['水'], description:'全球貨櫃航運龍頭' },
+  { code:'2609', name:'陽明', market:'TW', five_elements:['水'], description:'遠洋貨櫃航運，國際物流通路' },
+  { code:'1216', name:'統一', market:'TW', five_elements:['水'], description:'民生必需食品通路與流動性現金流' },
+  { code:'6472', name:'保瑞', market:'TW', five_elements:['木'], description:'生技CDMO代工龍頭' },
+  { code:'1904', name:'正隆', market:'TW', five_elements:['木'], description:'傳統造紙工業，木材加工產品' },
+  { code:'1402', name:'遠東新', market:'TW', five_elements:['木'], description:'紡織化纖龍頭' },
+  { code:'NVDA', name:'輝達', market:'US', five_elements:['火'], description:'AI高速運算GPU晶片龍頭' },
+  { code:'GOOG', name:'Alphabet', market:'US', five_elements:['火'], description:'搜尋引擎、YouTube廣告與AI模型' },
+  { code:'META', name:'Meta', market:'US', five_elements:['火'], description:'社群媒體、元宇宙與大語言模型運算' },
+  { code:'TSLA', name:'特斯拉', market:'US', five_elements:['火'], description:'電動車、儲能技術、自動駕駛' },
+  { code:'NFLX', name:'網飛', market:'US', five_elements:['火'], description:'影音娛樂串流平台' },
+  { code:'AAPL', name:'蘋果', market:'US', five_elements:['金'], description:'高階消費性硬體設備與生態系' },
+  { code:'TSM', name:'台積電ADR', market:'US', five_elements:['金'], description:'全球高階晶圓製造核心硬體設備底座' },
+  { code:'AMD', name:'超微', market:'US', five_elements:['金'], description:'半導體處理器硬體製造與設計' },
+  { code:'JPM', name:'摩根大通', market:'US', five_elements:['金'], description:'全球最大金融銀行之一' },
+  { code:'V', name:'Visa', market:'US', five_elements:['金'], description:'全球數位支付與貨幣結算系統' },
+  { code:'MS', name:'摩根士丹利', market:'US', five_elements:['金'], description:'華爾街投資銀行與財富管理機構' },
+  { code:'AMZN', name:'亞馬遜', market:'US', five_elements:['土'], description:'全球電商巨頭，倉儲與物流基建' },
+  { code:'BRK.B', name:'波克夏', market:'US', five_elements:['金'], description:'價值投資旗艦，保險與金融控股占多數' },
+  { code:'MSFT', name:'微軟', market:'US', five_elements:['木'], sector:'軟體服務', description:'作業系統與Azure雲端服務，軟體訂閱營收占大宗' },
+  { code:'XOM', name:'埃克森美孚', market:'US', five_elements:['土'], description:'傳統石油與天然氣，基礎原物料' },
+  { code:'PG', name:'寶僑', market:'US', five_elements:['水'], description:'民生必需消費品龍頭，高殖利率現金流' },
+  { code:'KO', name:'可口可樂', market:'US', five_elements:['水'], description:'全球飲料龍頭，防禦型現金流' },
+  { code:'PEP', name:'百事可樂', market:'US', five_elements:['水'], description:'食品飲料龍頭，民生高流動性必需資產' },
+  { code:'LLY', name:'禮來', market:'US', five_elements:['木'], description:'減肥藥與生技醫療創新龍頭' },
+  { code:'UNH', name:'聯合健康', market:'US', five_elements:['木'], description:'美國最大醫療保險與健康照護體系' },
+  { code:'JNJ', name:'強生', market:'US', five_elements:['木'], description:'傳統製藥、醫療器材與長線健康產業' }
+];
+
+// 同一五行底下若有不同產業子類(如木=生技醫療+軟體服務)，分開標示子標籤，避免混在同一份清單裡看不出差異
+function renderStocksBySector(stocks) {
+  if (!stocks.length) return '—';
+  const groups = {};
+  const order = [];
+  stocks.forEach(s => {
+    const key = s.sector || '';
+    if (!(key in groups)) { groups[key] = []; order.push(key); }
+    groups[key].push(s);
+  });
+  const badge = (s) => `<span class="stock-badge" title="${s.description}">${s.name}(${s.code})</span>`;
+  return order.map(key => {
+    const items = groups[key].map(badge).join('');
+    return key ? `<div class="stock-sector-label">${key}</div>${items}` : items;
+  }).join('');
+}
+
+function renderStockRefTable() {
+  const el = document.getElementById('stockRefTable');
+  if (!el) return;
+  const elements = ['土','金','水','木','火'];
+  el.innerHTML = elements.map(elm => {
+    const twStocks = globalStockDatabase.filter(s => s.market === 'TW' && s.five_elements.includes(elm));
+    const usStocks = globalStockDatabase.filter(s => s.market === 'US' && s.five_elements.includes(elm));
+    return `<div class="stock-ref-row">
+      <div><span class="element-tag tag-${getElementTag(elm)}">${elm}</span></div>
+      <div><div class="stock-ref-market-label">台股</div>${renderStocksBySector(twStocks)}</div>
+      <div><div class="stock-ref-market-label">美股</div>${renderStocksBySector(usStocks)}</div>
+    </div>`;
+  }).join('');
+}
+renderStockRefTable();
+
+// 存取防護：僅前端密碼比對＋到期日檢查，屬軟性阻擋(擋隨手點連結的人)，不是真正的伺服器端安全機制，會看原始碼的人仍可繞過
+const GATE_EXPIRY = '2026-12-31';
+const GATE_PASSWORD_HASH = 'e433356672c18885ca68d058450bf7c26ab10580810efe9f5057dc3b8728924d';
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function isGateExpired() {
+  const expiry = new Date(GATE_EXPIRY + 'T23:59:59');
+  return new Date() > expiry;
+}
+
+function unlockApp() {
+  document.getElementById('gateOverlay').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+}
+
+async function checkGatePassword() {
+  const input = document.getElementById('gatePassword').value;
+  const hash = await sha256Hex(input);
+  if (hash === GATE_PASSWORD_HASH) {
+    localStorage.setItem('wuxing_gate_unlocked', GATE_PASSWORD_HASH);
+    unlockApp();
+  } else {
+    document.getElementById('gateError').style.display = 'block';
+  }
+}
+
+(function initGate() {
+  if (isGateExpired()) {
+    document.getElementById('gateExpired').style.display = 'block';
+    document.getElementById('gateLogin').style.display = 'none';
+    return;
+  }
+  if (localStorage.getItem('wuxing_gate_unlocked') === GATE_PASSWORD_HASH) {
+    unlockApp();
+  }
+})();
+</script>
+</body>
+</html>
